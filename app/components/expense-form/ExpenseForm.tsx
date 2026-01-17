@@ -57,6 +57,7 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
           precision={2}
           min={0}
           controls={false}
+          decimalSeparator=","
         />
       </Form.Item>
       <Form.Item
@@ -78,6 +79,7 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
           prefix={CURRENCY_SYMBOLS.BRL}
           precision={2}
           min={0}
+          decimalSeparator=","
           controls={false}
         />
       </Form.Item>
@@ -110,7 +112,7 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
             ),
           },
           {
-            pattern: /^[a-zA-ZÀ-ÿ0-9\s.,!?-]+$/,
+            pattern: /^[a-zA-ZÀ-ÿ0-9\s.,!?:\-\n]+$/,
             message: VALIDATION_MESSAGES.invalidCharacters,
           },
         ]}

@@ -107,12 +107,14 @@ export default function ConsultarPage() {
       title: "Descrição",
       dataIndex: "descricao",
       key: "descricao",
-      ellipsis: true,
+      ellipsis: { showTitle: true },
     },
     {
       title: "EUR",
       dataIndex: "custoEUR",
       key: "custoEUR",
+      width: 110,
+      align: "center" as const,
       render: (value: number) => (
         <Tag color="blue">{formatCurrency(value, "EUR")}</Tag>
       ),
@@ -121,6 +123,8 @@ export default function ConsultarPage() {
       title: "BRL",
       dataIndex: "custoBRL",
       key: "custoBRL",
+      width: 110,
+      align: "center" as const,
       render: (value: number) => (
         <Tag color="green">{formatCurrency(value, "BRL")}</Tag>
       ),
@@ -129,6 +133,8 @@ export default function ConsultarPage() {
       title: "Data",
       dataIndex: "data",
       key: "data",
+      width: 100,
+      align: "center" as const,
       render: (value: string) =>
         new Date(value).toLocaleDateString("pt-BR", {
           day: "2-digit",
@@ -139,7 +145,8 @@ export default function ConsultarPage() {
     {
       title: "Ações",
       key: "actions",
-      width: 60,
+      width: 70,
+      align: "center" as const,
       render: (_, record) => (
         <Popconfirm
           title="Excluir gasto"
