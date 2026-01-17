@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-
+/* Ant Design Menu Styles */
 .ant-menu {
   background: transparent !important;
 }
@@ -12,4 +12,48 @@
 .ant-menu-item-selected {
   background-color: #1890ff !important;
   color: white !important;
+}
+
+/* Mobile responsive table */
+.expense-table .ant-table {
+  font-size: 12px;
+}
+
+@media (min-width: 768px) {
+  .expense-table .ant-table {
+    font-size: 14px;
+  }
+}
+
+/* Ant Design Select for dark theme */
+.ant-select-selector {
+  background-color: #27272a !important;
+  border-color: #3f3f46 !important;
+}
+
+.ant-select-selection-item,
+.ant-select-selection-placeholder {
+  color: white !important;
+}
+
+.ant-select-arrow {
+  color: white !important;
+}
+
+/* Mobile pagination */
+@media (max-width: 640px) {
+  .ant-pagination {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .ant-pagination-item,
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    min-width: 28px;
+    height: 28px;
+    line-height: 28px;
+  }
 }

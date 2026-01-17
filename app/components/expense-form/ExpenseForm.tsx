@@ -119,8 +119,8 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
         />
       </Form.Item>
       <Form.Item>
-        <div className="grid grid-cols-2 gap-4">
-          <Link href="/consultar">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+          <Link href="/consultar" className="order-2 sm:order-1">
             <Button size="large" htmlType="button" className="w-full">
               Consultar
             </Button>
@@ -130,7 +130,7 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
             size="large"
             htmlType="submit"
             loading={loading}
-            className="w-full"
+            className="w-full order-1 sm:order-2"
           >
             Registar
           </Button>

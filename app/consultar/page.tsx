@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Table, Tag, Spin, Button, Statistic, Menu } from "antd";
+import { Table, Tag, Spin, Button, Statistic, Select } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { Expense } from "@/types";
@@ -91,17 +91,19 @@ export default function ConsultarPage() {
       title: "Descrição",
       dataIndex: "descricao",
       key: "descricao",
+      ellipsis: true,
     },
     {
-      title: "Custo EUR",
+      title: "EUR",
       dataIndex: "custoEUR",
       key: "custoEUR",
+      responsive: ["sm"] as const,
       render: (value: number) => (
         <Tag color="blue">{formatCurrency(value, "EUR")}</Tag>
       ),
     },
     {
-      title: "Custo BRL",
+      title: "BRL",
       dataIndex: "custoBRL",
       key: "custoBRL",
       render: (value: number) => (
@@ -112,6 +114,7 @@ export default function ConsultarPage() {
       title: "Data",
       dataIndex: "data",
       key: "data",
+      responsive: ["md"] as const,
       render: (value: string) =>
         new Date(value).toLocaleDateString("pt-BR", {
           day: "2-digit",
@@ -130,82 +133,114 @@ export default function ConsultarPage() {
   }
 
   return (
-    <div className="col-span-4 md:col-span-8 xl:col-span-12 flex gap-4">
-      <div className="w-48 bg-zinc-900 text-white shadow-lg p-4 rounded-2xl ">
+    <div className="col-span-4 md:col-span-8 xl:col-span-12 flex flex-col lg:flex-row gap-3 md:gap-4">
+      {/* Mobile/Tablet: Dropdown selector */}
+      <div className="lg:hidden bg-zinc-900 text-white shadow-lg p-3 rounded-xl">
+        <div className="flex items-center gap-2 mb-2">
+          <CalendarOutlined />
+          <span className="font-semibold">Selecionar Mês</span>
+        </div>
+        <Select
+          className="w-full"
+          size="large"
+          value={selectedMonth}
+          onChange={(value) => setSelectedMonth(value)}
+          options={availableMonths.map(([key, { label }]) => ({
+            value: key,
+            label: <span className="capitalize">{label}</span>,
+          }))}
+          placeholder="Selecione um mês"
+        />
+      </div>
+
+      {/* Desktop: Sidebar menu */}
+      <div className="hidden lg:block w-48 bg-zinc-900 text-white shadow-lg p-4 rounded-2xl shrink-0">
         <h2 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
           <CalendarOutlined /> Meses
         </h2>
-        <Menu
-          mode="vertical"
-          selectedKeys={selectedMonth ? [selectedMonth] : []}
-          onClick={({ key }) => setSelectedMonth(key)}
-          items={availableMonths.map(([key, { label }]) => ({
-            key,
-            label: <span className="capitalize">{label}</span>,
-          }))}
-          style={{ backgroundColor: "transparent", color: "white" }}
-        />
+        <div className="flex flex-col gap-1">
+          {availableMonths.map(([key, { label }]) => (
+            <button
+              key={key}
+              onClick={() => setSelectedMonth(key)}
+              className={`text-left px-3 py-2 rounded-lg capitalize transition-colors ${
+                selectedMonth === key
+                  ? "bg-blue-500 text-white"
+                  : "text-gray-300 hover:bg-zinc-800"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         {availableMonths.length === 0 && (
           <p className="text-gray-400 text-sm">Nenhum gasto registado</p>
         )}
       </div>
 
-      <div className="flex-1 bg-zinc-900 shadow-lg p-4 rounded-2xl">
-        <div className="flex justify-center mb-4">
-          <h1 className="text-white text-2xl font-bold capitalize">
+      <div className="flex-1 bg-zinc-900 shadow-lg p-3 md:p-4 rounded-xl md:rounded-2xl min-w-0 overflow-hidden">
+        <div className="flex justify-center mb-3 md:mb-4">
+          <h1 className="text-white text-lg md:text-2xl font-bold capitalize text-center truncate">
             Gastos de {monthlyTotals.monthName}
           </h1>
         </div>
-        <Table
-          dataSource={filteredExpenses}
-          columns={columns}
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
-          className="expense-table"
-        />
+        <div className="overflow-x-auto">
+          <Table
+            dataSource={filteredExpenses}
+            columns={columns}
+            rowKey="id"
+            pagination={{ pageSize: 10, simple: true }}
+            className="expense-table"
+            size="small"
+            scroll={{ x: 300 }}
+          />
+        </div>
 
-        <div className="mt-4 bg-zinc-800 border-zinc-700 flex flex-col p-4 rounded-lg">
-          <h2 className="text-white text-lg font-semibold mb-4 capitalize text-center">
+        <div className="mt-3 md:mt-4 bg-zinc-800 border-zinc-700 flex flex-col p-3 md:p-4 rounded-lg">
+          <h2 className="text-white text-sm md:text-lg font-semibold mb-3 md:mb-4 capitalize text-center">
             Total de {monthlyTotals.monthName}
           </h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
             <Statistic
-              title={<span className="text-gray-400">Gastos</span>}
+              title={<span className="text-gray-400 text-xs md:text-sm">Gastos</span>}
               value={monthlyTotals.count}
               styles={{
                 content: {
                   color: "#fff",
+                  fontSize: "1.25rem",
                 },
               }}
             />
             <Statistic
-              title={<span className="text-gray-400">Total EUR</span>}
+              title={<span className="text-gray-400 text-xs md:text-sm">Total EUR</span>}
               value={monthlyTotals.totalEUR}
               precision={2}
               prefix="€"
               styles={{
                 content: {
                   color: "#1890ff",
+                  fontSize: "1.25rem",
                 },
               }}
             />
             <Statistic
-              title={<span className="text-gray-400">Total BRL</span>}
+              title={<span className="text-gray-400 text-xs md:text-sm">Total BRL</span>}
               value={monthlyTotals.totalBRL}
               precision={2}
               prefix="R$"
               styles={{
                 content: {
                   color: "#1890ff",
+                  fontSize: "1.25rem",
                 },
               }}
             />
           </div>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-3 md:mt-4">
           <Link href="/">
-            <Button size="large" htmlType="button">
+            <Button size="large" htmlType="button" className="w-full sm:w-auto">
               Voltar
             </Button>
           </Link>

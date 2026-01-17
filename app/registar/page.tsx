@@ -29,9 +29,9 @@ export default function RegistarPage() {
   };
 
   return (
-    <div className="col-span-4 md:col-start-2 md:col-span-6 xl:col-start-4 xl:col-span-6 bg-zinc-900 shadow-lg p-4 rounded-2xl">
+    <div className="col-span-4 md:col-start-2 md:col-span-6 xl:col-start-4 xl:col-span-6 bg-zinc-900 shadow-lg p-3 md:p-4 rounded-xl md:rounded-2xl">
       <div className="flex justify-center">
-        <h1 className="text-white text-2xl font-bold mb-4">Registar Gasto</h1>
+        <h1 className="text-white text-xl md:text-2xl font-bold mb-3 md:mb-4">Registar Gasto</h1>
       </div>
       <ExpenseForm onSubmit={handleSubmit} loading={loading} />
     </div>

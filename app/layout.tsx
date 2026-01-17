@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Header from "./components/header/Header";
 import GridDebug from "./components/debug/GridDebug";
@@ -8,6 +8,13 @@ export const metadata: Metadata = {
   description: "A simple expense tracking application.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -15,8 +22,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className="min-h-screen">        
-        <main className="min-h-screen grid grid-cols-4 md:grid-cols-8 xl:grid-cols-12 gap-4 py-10 px-4 items-center">
+      <body className="min-h-screen">
+        <main className="min-h-screen grid grid-cols-4 md:grid-cols-8 xl:grid-cols-12 gap-2 md:gap-4 py-4 md:py-10 px-3 md:px-4 items-center">
           {children}
         </main>
       </body>
