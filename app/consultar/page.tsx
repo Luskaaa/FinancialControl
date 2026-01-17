@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Table, Tag, Spin, Button, Statistic, Select } from "antd";
-import { CalendarOutlined } from "@ant-design/icons";
+import { Table, Tag, Spin, Button, Statistic, Select, message, Popconfirm } from "antd";
+import { CalendarOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { Expense } from "@/types";
 import { formatCurrency } from "@/utils";
@@ -86,6 +86,22 @@ export default function ConsultarPage() {
     };
   }, [filteredExpenses, selectedMonth, availableMonths]);
 
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`/api/expenses?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Erro ao excluir");
+
+      setExpenses(expenses.filter((exp) => exp.id !== id));
+      message.success("Gasto excluído com sucesso!");
+    } catch (error) {
+      console.error(error);
+      message.error("Erro ao excluir gasto");
+    }
+  };
+
   const columns: ColumnsType<Expense> = [
     {
       title: "Descrição",
@@ -97,7 +113,6 @@ export default function ConsultarPage() {
       title: "EUR",
       dataIndex: "custoEUR",
       key: "custoEUR",
-      responsive: ["sm"] as const,
       render: (value: number) => (
         <Tag color="blue">{formatCurrency(value, "EUR")}</Tag>
       ),
@@ -114,13 +129,34 @@ export default function ConsultarPage() {
       title: "Data",
       dataIndex: "data",
       key: "data",
-      responsive: ["md"] as const,
       render: (value: string) =>
         new Date(value).toLocaleDateString("pt-BR", {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
         }),
+    },
+    {
+      title: "Ações",
+      key: "actions",
+      width: 60,
+      render: (_, record) => (
+        <Popconfirm
+          title="Excluir gasto"
+          description="Tens a certeza que queres excluir este gasto?"
+          onConfirm={() => handleDelete(record.id)}
+          okText="Sim"
+          cancelText="Não"
+          okButtonProps={{ danger: true }}
+        >
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
+            size="small"
+          />
+        </Popconfirm>
+      ),
     },
   ];
 
@@ -153,7 +189,6 @@ export default function ConsultarPage() {
         />
       </div>
 
-      {/* Desktop: Sidebar menu */}
       <div className="hidden lg:block w-48 bg-zinc-900 text-white shadow-lg p-4 rounded-2xl shrink-0">
         <h2 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
           <CalendarOutlined /> Meses

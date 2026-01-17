@@ -1,6 +1,8 @@
 "use client";
 
 import { Form, Input, InputNumber, Button, DatePicker } from "antd";
+import { CalendarOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 import { ExpenseFormValues } from "@/types";
 import { normalizeNumber, normalizeText } from "@/utils";
 import {
@@ -23,6 +25,10 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
   const handleFinish = (values: ExpenseFormValues) => {
     onSubmit(values);
     form.resetFields();
+  };
+
+  const setToday = () => {
+    form.setFieldsValue({ data: dayjs() });
   };
 
   return (

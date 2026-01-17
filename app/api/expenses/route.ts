@@ -35,3 +35,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Erro ao criar gasto" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID é obrigatório" },
+        { status: 400 },
+      );
+    }
+
+    await prisma.expense.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.error("Erro ao excluir gasto:", error);
+    return NextResponse.json(
+      { error: "Erro ao excluir gasto" },
+      { status: 500 },
+    );
+  }
+}
