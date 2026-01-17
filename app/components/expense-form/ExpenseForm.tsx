@@ -1,0 +1,141 @@
+"use client";
+
+import { Form, Input, InputNumber, Button, DatePicker } from "antd";
+import { ExpenseFormValues } from "@/types";
+import { normalizeNumber, normalizeText } from "@/utils";
+import {
+  FORM_RULES,
+  DATE_FORMAT,
+  CURRENCY_SYMBOLS,
+  VALIDATION_MESSAGES,
+} from "@/constants";
+import TextArea from "antd/es/input/TextArea";
+import Link from "next/link";
+
+interface ExpenseFormProps {
+  onSubmit: (values: ExpenseFormValues) => void;
+  loading?: boolean;
+}
+
+export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
+  const [form] = Form.useForm<ExpenseFormValues>();
+
+  const handleFinish = (values: ExpenseFormValues) => {
+    onSubmit(values);
+    form.resetFields();
+  };
+
+  return (
+    <Form
+      form={form}
+      onFinish={handleFinish}
+      validateTrigger={["onBlur", "onChange"]}
+    >
+      <Form.Item
+        name="custoEUR"
+        rules={[
+          { required: true, message: "Por favor, insira o custo em EUR" },
+          {
+            type: "number",
+            min: FORM_RULES.minCurrencyValue,
+            message: VALIDATION_MESSAGES.minValue,
+          },
+        ]}
+        normalize={normalizeNumber}
+      >
+        <InputNumber
+          placeholder="Custo em EUR"
+          className="w-full! h-15"
+          size="large"
+          prefix={CURRENCY_SYMBOLS.EUR}
+          precision={2}
+          min={0}
+          controls={false}
+        />
+      </Form.Item>
+      <Form.Item
+        name="custoBRL"
+        rules={[
+          { required: true, message: "Por favor, insira o custo em R$" },
+          {
+            type: "number",
+            min: FORM_RULES.minCurrencyValue,
+            message: VALIDATION_MESSAGES.minValue,
+          },
+        ]}
+        normalize={normalizeNumber}
+      >
+        <InputNumber
+          placeholder="Custo em R$"
+          className="w-full! h-15"
+          size="large"
+          prefix={CURRENCY_SYMBOLS.BRL}
+          precision={2}
+          min={0}
+          controls={false}
+        />
+      </Form.Item>
+      <Form.Item
+        name="data"
+        rules={[{ required: true, message: "Por favor, selecione a data" }]}
+      >
+        <DatePicker
+          showTime={false}
+          placeholder="Data"
+          className="w-full h-15"
+          size="large"
+          format={DATE_FORMAT}
+        />
+      </Form.Item>
+      <Form.Item
+        name="descricao"
+        rules={[
+          { required: true, message: "Por favor, insira uma descrição" },
+          {
+            min: FORM_RULES.descricaoMinLength,
+            message: VALIDATION_MESSAGES.minLength(
+              FORM_RULES.descricaoMinLength,
+            ),
+          },
+          {
+            max: FORM_RULES.descricaoMaxLength,
+            message: VALIDATION_MESSAGES.maxLength(
+              FORM_RULES.descricaoMaxLength,
+            ),
+          },
+          {
+            pattern: /^[a-zA-ZÀ-ÿ0-9\s.,!?-]+$/,
+            message: VALIDATION_MESSAGES.invalidCharacters,
+          },
+        ]}
+        normalize={normalizeText}
+      >
+        <TextArea
+          rows={5}
+          placeholder="Descrição"
+          size="large"
+          maxLength={FORM_RULES.descricaoMaxLength}
+          autoSize={{ minRows: 3, maxRows: 6 }}
+        />
+      </Form.Item>
+      <Form.Item>
+        <div className="grid grid-cols-2 gap-4">
+          <Link href="/consultar">
+            <Button size="large" htmlType="button" className="w-full">
+              Consultar
+            </Button>
+          </Link>
+          <Button
+            type="primary"
+            size="large"
+            htmlType="submit"
+            loading={loading}
+            className="w-full"
+          >
+            Registar
+          </Button>
+        </div>
+      </Form.Item>
+    </Form>
+  );
+}
