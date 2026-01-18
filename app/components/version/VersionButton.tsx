@@ -15,7 +15,7 @@ export default function VersionButton() {
         shape="circle"
         icon={<InfoCircleOutlined />}
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-12 h-12 flex items-center justify-center shadow-lg z-50"
+        className="fixed md:bottom-6 md:right-6 w-12 h-12 shadow-lg z-50"
         title={`Versão ${APP_VERSION}`}
       />
 
@@ -44,7 +44,9 @@ export default function VersionButton() {
                 <div key={release.version}>
                   <div className="flex items-center gap-2 mb-2">
                     <Tag color="green">v{release.version}</Tag>
-                    <span className="text-gray-500 text-sm">{release.date}</span>
+                    <span className="text-gray-500 text-sm">
+                      {release.date}
+                    </span>
                   </div>
                   <ul className="list-none p-0 m-0 space-y-1">
                     {release.changes.map((change, index) => (

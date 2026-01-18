@@ -1,6 +1,16 @@
-export const APP_VERSION = "1.0.0";
+export const APP_VERSION = "1.1.0";
 
 export const CHANGELOG = [
+  {
+    version: "1.1.0",
+    date: "2026-01-18",
+    changes: [
+      "🔠 Descrição com primeira letra maiúscula automática",
+      "🔍 Barra de pesquisa para filtrar gastos",
+      "📄 Paginação com cor branca (tema escuro)",
+      "📐 Layout ajustado para caber na tela sem scroll",
+    ],
+  },
   {
     version: "1.0.0",
     date: "2026-01-17",

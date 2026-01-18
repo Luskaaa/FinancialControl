@@ -4,9 +4,17 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const expenses = await prisma.expense.findMany({
-      orderBy: { data: "desc" },
+      orderBy: [{ createdAt: "desc" }, { data: "desc" }],
     });
-    return NextResponse.json(expenses);
+
+    const formattedExpenses = expenses.map((expense) => ({
+      ...expense,
+      descricao: expense.descricao
+        ? expense.descricao.charAt(0).toUpperCase() + expense.descricao.slice(1)
+        : expense.descricao,
+    }));
+
+    return NextResponse.json(formattedExpenses);
   } catch (error) {
     console.error("Erro ao buscar gastos:", error);
     return NextResponse.json(
@@ -42,10 +50,7 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json(
-        { error: "ID é obrigatório" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "ID é obrigatório" }, { status: 400 });
     }
 
     await prisma.expense.delete({

@@ -2,16 +2,15 @@ export const normalizeNumber = (
   value: string | number | undefined,
 ): number | undefined => {
   if (value === undefined || value === "") return undefined;
-  
-  // Converte vírgula para ponto (formato português/brasileiro para JavaScript)
-  const normalizedValue = typeof value === "string" 
-    ? value.replace(",", ".") 
-    : value;
-  
-  const num = typeof normalizedValue === "string" 
-    ? parseFloat(normalizedValue) 
-    : normalizedValue;
-    
+
+  const normalizedValue =
+    typeof value === "string" ? value.replace(",", ".") : value;
+
+  const num =
+    typeof normalizedValue === "string"
+      ? parseFloat(normalizedValue)
+      : normalizedValue;
+
   if (isNaN(num)) return undefined;
   return Math.round(num * 100) / 100;
 };

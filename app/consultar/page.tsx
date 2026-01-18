@@ -1,8 +1,18 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Table, Tag, Spin, Button, Statistic, Select, message, Popconfirm } from "antd";
-import { CalendarOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  Table,
+  Tag,
+  Spin,
+  Button,
+  Statistic,
+  Select,
+  message,
+  Popconfirm,
+  Input,
+} from "antd";
+import { CalendarOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { Expense } from "@/types";
 import { formatCurrency } from "@/utils";
@@ -12,6 +22,7 @@ export default function ConsultarPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchExpenses();
@@ -64,14 +75,27 @@ export default function ConsultarPage() {
   }, [availableMonths, selectedMonth]);
 
   const filteredExpenses = useMemo(() => {
-    if (!selectedMonth) return expenses;
+    let filtered = expenses;
 
-    const [year, month] = selectedMonth.split("-").map(Number);
-    return expenses.filter((expense) => {
-      const date = new Date(expense.data);
-      return date.getMonth() === month && date.getFullYear() === year;
-    });
-  }, [expenses, selectedMonth]);
+    // Filtrar por mês
+    if (selectedMonth) {
+      const [year, month] = selectedMonth.split("-").map(Number);
+      filtered = filtered.filter((expense) => {
+        const date = new Date(expense.data);
+        return date.getMonth() === month && date.getFullYear() === year;
+      });
+    }
+
+    // Filtrar por termo de pesquisa
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter((expense) =>
+        expense.descricao.toLowerCase().includes(term)
+      );
+    }
+
+    return filtered;
+  }, [expenses, selectedMonth, searchTerm]);
 
   const monthlyTotals = useMemo(() => {
     const selectedMonthData = availableMonths.find(
@@ -158,12 +182,7 @@ export default function ConsultarPage() {
           cancelText="Não"
           okButtonProps={{ danger: true }}
         >
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            size="small"
-          />
+          <Button type="text" danger icon={<DeleteOutlined />} size="small" />
         </Popconfirm>
       ),
     },
@@ -178,7 +197,7 @@ export default function ConsultarPage() {
   }
 
   return (
-    <div className="col-span-4 md:col-span-8 xl:col-span-12 flex flex-col lg:flex-row gap-3 md:gap-4">
+    <div className="col-span-4 md:col-span-8 xl:col-span-12 flex flex-col lg:flex-row gap-3 md:gap-4 h-full max-h-full overflow-hidden">
       {/* Mobile/Tablet: Dropdown selector */}
       <div className="lg:hidden bg-zinc-900 text-white shadow-lg p-3 rounded-xl">
         <div className="flex items-center gap-2 mb-2">
@@ -222,31 +241,44 @@ export default function ConsultarPage() {
         )}
       </div>
 
-      <div className="flex-1 bg-zinc-900 shadow-lg p-3 md:p-4 rounded-xl md:rounded-2xl min-w-0 overflow-hidden">
+      <div className="flex-1 bg-zinc-900 shadow-lg p-3 md:p-4 rounded-xl md:rounded-2xl min-w-0 overflow-hidden flex flex-col">
         <div className="flex justify-center mb-3 md:mb-4">
           <h1 className="text-white text-lg md:text-2xl font-bold capitalize text-center truncate">
             Gastos de {monthlyTotals.monthName}
           </h1>
         </div>
-        <div className="overflow-x-auto">
+        <div className="mb-3 md:mb-4">
+          <Input
+            placeholder="Pesquisar por descrição..."
+            prefix={<SearchOutlined className="text-gray-400" />}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            allowClear
+            size="large"
+            className="search-input"
+          />
+        </div>
+        <div className="overflow-auto flex-1 min-h-0">
           <Table
             dataSource={filteredExpenses}
             columns={columns}
             rowKey="id"
-            pagination={{ pageSize: 10, simple: true }}
+            pagination={{ pageSize: 9, placement: ["bottomCenter"] }}
             className="expense-table"
             size="small"
             scroll={{ x: 300 }}
           />
         </div>
 
-        <div className="mt-3 md:mt-4 bg-zinc-800 border-zinc-700 flex flex-col p-3 md:p-4 rounded-lg">
+        <div className="mt-auto pt-3 md:pt-4 bg-zinc-800 border-zinc-700 flex flex-col p-3 md:p-4 rounded-lg shrink-0">
           <h2 className="text-white text-sm md:text-lg font-semibold mb-3 md:mb-4 capitalize text-center">
             Total de {monthlyTotals.monthName}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
             <Statistic
-              title={<span className="text-gray-400 text-xs md:text-sm">Gastos</span>}
+              title={
+                <span className="text-gray-400 text-xs md:text-sm">Gastos</span>
+              }
               value={monthlyTotals.count}
               styles={{
                 content: {
@@ -256,7 +288,11 @@ export default function ConsultarPage() {
               }}
             />
             <Statistic
-              title={<span className="text-gray-400 text-xs md:text-sm">Total EUR</span>}
+              title={
+                <span className="text-gray-400 text-xs md:text-sm">
+                  Total EUR
+                </span>
+              }
               value={monthlyTotals.totalEUR}
               precision={2}
               prefix="€"
@@ -268,7 +304,11 @@ export default function ConsultarPage() {
               }}
             />
             <Statistic
-              title={<span className="text-gray-400 text-xs md:text-sm">Total BRL</span>}
+              title={
+                <span className="text-gray-400 text-xs md:text-sm">
+                  Total BRL
+                </span>
+              }
               value={monthlyTotals.totalBRL}
               precision={2}
               prefix="R$"
