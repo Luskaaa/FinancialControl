@@ -11,18 +11,28 @@ import {
   message,
   Popconfirm,
   Input,
+  Modal,
+  Form,
+  InputNumber,
+  DatePicker,
 } from "antd";
-import { CalendarOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+import { CalendarOutlined, DeleteOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { Expense } from "@/types";
 import { formatCurrency } from "@/utils";
 import Link from "antd/es/typography/Link";
+import dayjs from "dayjs";
+import TextArea from "antd/es/input/TextArea";
 
 export default function ConsultarPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [editLoading, setEditLoading] = useState(false);
+  const [form] = Form.useForm();
 
   useEffect(() => {
     fetchExpenses();
@@ -103,8 +113,8 @@ export default function ConsultarPage() {
     );
 
     return {
-      totalEUR: filteredExpenses.reduce((sum, exp) => sum + exp.custoEUR, 0),
-      totalBRL: filteredExpenses.reduce((sum, exp) => sum + exp.custoBRL, 0),
+      totalEUR: filteredExpenses.reduce((sum, exp) => sum + (exp.custoEUR ?? 0), 0),
+      totalBRL: filteredExpenses.reduce((sum, exp) => sum + (exp.custoBRL ?? 0), 0),
       count: filteredExpenses.length,
       monthName: selectedMonthData?.[1]?.label || "Sem dados",
     };
@@ -118,11 +128,58 @@ export default function ConsultarPage() {
 
       if (!response.ok) throw new Error("Erro ao excluir");
 
-      setExpenses(expenses.filter((exp) => exp.id !== id));
+      await fetchExpenses();
       message.success("Gasto excluído com sucesso!");
     } catch (error) {
       console.error(error);
       message.error("Erro ao excluir gasto");
+    }
+  };
+
+  const handleEdit = (expense: Expense) => {
+    setEditingExpense(expense);
+    form.setFieldsValue({
+      custoEUR: expense.custoEUR,
+      custoBRL: expense.custoBRL,
+      data: dayjs(expense.data),
+      descricao: expense.descricao,
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      setEditLoading(true);
+
+      const response = await fetch("/api/expenses", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingExpense?.id,
+          custoEUR: values.custoEUR,
+          custoBRL: values.custoBRL,
+          data: values.data.toISOString(),
+          descricao: values.descricao,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Erro ao atualizar");
+
+      const updatedExpense = await response.json();
+      setExpenses(expenses.map((exp) => 
+        exp.id === updatedExpense.id ? { ...exp, ...updatedExpense } : exp
+      ));
+      
+      message.success("Gasto atualizado com sucesso!");
+      setEditModalOpen(false);
+      setEditingExpense(null);
+      form.resetFields();
+    } catch (error) {
+      console.error(error);
+      message.error("Erro ao atualizar gasto");
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -133,7 +190,17 @@ export default function ConsultarPage() {
       key: "descricao",
       ellipsis: { showTitle: true },
       fixed: "left" as const,
-      width: 100,
+      width: 120,
+      render: (value: string, record: Expense) => (
+        <div className="flex flex-col">
+          <span>{value}</span>
+          {record.parcelado && record.parcelaAtual && record.numeroParcelas && (
+            <Tag color="purple" className="w-fit mt-1">
+              {record.parcelaAtual}/{record.numeroParcelas}
+            </Tag>
+          )}
+        </div>
+      ),
     },
     {
       title: "EUR",
@@ -141,9 +208,12 @@ export default function ConsultarPage() {
       key: "custoEUR",
       width: 90,
       align: "center" as const,
-      render: (value: number) => (
-        <Tag color="blue">{formatCurrency(value, "EUR")}</Tag>
-      ),
+      render: (value: number | null) => 
+        value != null ? (
+          <Tag color="blue">{formatCurrency(value, "EUR")}</Tag>
+        ) : (
+          <span className="text-gray-500">-</span>
+        ),
     },
     {
       title: "BRL",
@@ -151,9 +221,12 @@ export default function ConsultarPage() {
       key: "custoBRL",
       width: 95,
       align: "center" as const,
-      render: (value: number) => (
-        <Tag color="green">{formatCurrency(value, "BRL")}</Tag>
-      ),
+      render: (value: number | null) => 
+        value != null ? (
+          <Tag color="green">{formatCurrency(value, "BRL")}</Tag>
+        ) : (
+          <span className="text-gray-500">-</span>
+        ),
     },
     {
       title: "Data",
@@ -171,19 +244,31 @@ export default function ConsultarPage() {
     {
       title: "",
       key: "actions",
-      width: 50,
+      width: 80,
       align: "center" as const,
       render: (_, record) => (
-        <Popconfirm
-          title="Excluir gasto"
-          description="Tens a certeza que queres excluir este gasto?"
-          onConfirm={() => handleDelete(record.id)}
-          okText="Sim"
-          cancelText="Não"
-          okButtonProps={{ danger: true }}
-        >
-          <Button type="text" danger icon={<DeleteOutlined />} size="small" />
-        </Popconfirm>
+        <div className="flex gap-1">
+          <Button 
+            type="text" 
+            icon={<EditOutlined />} 
+            size="small"
+            onClick={() => handleEdit(record)}
+          />
+          <Popconfirm
+            title="Excluir gasto"
+            description={
+              record.parcelado 
+                ? "Este é um gasto parcelado. Todas as parcelas serão excluídas. Tens a certeza?" 
+                : "Tens a certeza que queres excluir este gasto?"
+            }
+            onConfirm={() => handleDelete(record.id)}
+            okText="Sim"
+            cancelText="Não"
+            okButtonProps={{ danger: true }}
+          >
+            <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+          </Popconfirm>
+        </div>
       ),
     },
   ];
@@ -217,11 +302,11 @@ export default function ConsultarPage() {
         />
       </div>
 
-      <div className="hidden lg:block w-48 bg-zinc-900 text-white shadow-lg p-4 rounded-2xl shrink-0">
+      <div className="hidden lg:flex w-48 bg-zinc-900 text-white shadow-lg p-4 rounded-2xl shrink-0 flex-col max-h-full">
         <h2 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
           <CalendarOutlined /> Meses
         </h2>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-800">
           {availableMonths.map(([key, { label }]) => (
             <button
               key={key}
@@ -330,6 +415,69 @@ export default function ConsultarPage() {
           </Link>
         </div>
       </div>
+
+      <Modal
+        title="Editar Gasto"
+        open={editModalOpen}
+        onCancel={() => {
+          setEditModalOpen(false);
+          setEditingExpense(null);
+          form.resetFields();
+        }}
+        onOk={handleEditSubmit}
+        confirmLoading={editLoading}
+        okText="Guardar"
+        cancelText="Cancelar"
+      >
+        <Form form={form} layout="vertical" className="mt-4">
+          <Form.Item name="custoEUR" label="Custo em EUR">
+            <InputNumber
+              placeholder="Custo em EUR"
+              className="w-full!"
+              size="large"
+              prefix="€"
+              precision={2}
+              min={0}
+              controls={false}
+              decimalSeparator=","
+            />
+          </Form.Item>
+          <Form.Item name="custoBRL" label="Custo em BRL">
+            <InputNumber
+              placeholder="Custo em R$"
+              className="w-full!"
+              size="large"
+              prefix="R$"
+              precision={2}
+              min={0}
+              controls={false}
+              decimalSeparator=","
+            />
+          </Form.Item>
+          <Form.Item
+            name="data"
+            label="Data"
+            rules={[{ required: true, message: "Selecione a data" }]}
+          >
+            <DatePicker
+              className="w-full"
+              size="large"
+              format="DD/MM/YYYY"
+            />
+          </Form.Item>
+          <Form.Item
+            name="descricao"
+            label="Descrição"
+            rules={[{ required: true, message: "Insira a descrição" }]}
+          >
+            <TextArea
+              rows={3}
+              placeholder="Descrição"
+              size="large"
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

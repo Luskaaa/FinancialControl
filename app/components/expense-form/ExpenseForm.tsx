@@ -1,6 +1,7 @@
 "use client";
 
-import { Form, Input, InputNumber, Button, DatePicker } from "antd";
+import { useState } from "react";
+import { Form, Input, InputNumber, Button, DatePicker, Switch } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { ExpenseFormValues } from "@/types";
@@ -21,10 +22,16 @@ interface ExpenseFormProps {
 
 export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
   const [form] = Form.useForm<ExpenseFormValues>();
+  const [isParcelado, setIsParcelado] = useState(false);
 
   const handleFinish = (values: ExpenseFormValues) => {
-    onSubmit(values);
+    onSubmit({
+      ...values,
+      parcelado: isParcelado,
+      numeroParcelas: isParcelado ? values.numeroParcelas : undefined,
+    });
     form.resetFields();
+    setIsParcelado(false);
   };
 
   const setToday = () => {
@@ -40,7 +47,6 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
       <Form.Item
         name="custoEUR"
         rules={[
-          { required: true, message: "Por favor, insira o custo em EUR" },
           {
             type: "number",
             min: FORM_RULES.minCurrencyValue,
@@ -63,7 +69,6 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
       <Form.Item
         name="custoBRL"
         rules={[
-          { required: true, message: "Por favor, insira o custo em R$" },
           {
             type: "number",
             min: FORM_RULES.minCurrencyValue,
@@ -126,6 +131,41 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
           autoSize={{ minRows: 3, maxRows: 6 }}
         />
       </Form.Item>
+      <div className="bg-zinc-800 p-4 rounded-lg mb-6 flex flex-col gap-5">
+        <div className="flex items-center justify-between ">
+          <span className="text-white">Pagamento parcelado?</span>
+          <Switch
+            checked={isParcelado}
+            onChange={(checked) => {
+              setIsParcelado(checked);
+              if (!checked) {
+                form.setFieldsValue({ numeroParcelas: undefined });
+              }
+            }}
+          />
+        </div>
+        {isParcelado && (
+          <Form.Item
+            name="numeroParcelas"
+            rules={[
+              {
+                required: isParcelado,
+                message: "Informe o número de parcelas",
+              },
+            ]}
+          >
+            <InputNumber
+              placeholder="Número de parcelas"
+              className="w-full! "
+              size="large"
+              min={2}
+              max={48}
+              controls={true}
+              precision={0}
+            />
+          </Form.Item>
+        )}
+      </div>
       <Form.Item>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
           <Link href="/consultar" className="order-2 sm:order-1">

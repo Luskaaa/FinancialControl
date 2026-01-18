@@ -1,6 +1,17 @@
-export const APP_VERSION = "1.1.0";
+export const APP_VERSION = "1.2.0";
 
 export const CHANGELOG = [
+  {
+    version: "1.2.0",
+    date: "2026-01-18",
+    changes: [
+      "💳 Suporte a gastos parcelados (múltiplas parcelas)",
+      "🗑️ Exclusão automática de todas as parcelas ao apagar uma",
+      "🔄 Atualização automática da lista após exclusão",
+      "📜 Menu de meses com scroll para muitos meses",
+      "⚠️ Confirmação especial ao excluir gastos parcelados",
+    ],
+  },
   {
     version: "1.1.0",
     date: "2026-01-18",

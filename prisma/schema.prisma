@@ -11,11 +11,18 @@ datasource db {
 }
 
 model Expense {
-  id          String   @id @default(cuid())
-  custoEUR    Float
-  custoBRL    Float
-  data        DateTime
-  descricao   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String    @id @default(cuid())
+  custoEUR        Float?
+  custoBRL        Float?
+  data            DateTime
+  descricao       String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  // Campos de parcelamento
+  parcelado       Boolean   @default(false)
+  numeroParcelas  Int?
+  parcelaAtual    Int?
+  parcelamentoId  String?   // ID para agrupar parcelas do mesmo pagamento
+  dataInicio      DateTime? // Data da primeira parcela
+  dataFim         DateTime? // Data da última parcela
 }
