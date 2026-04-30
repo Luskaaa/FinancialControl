@@ -34,3 +34,8 @@ export interface ApiResponse<T> {
   success: boolean;
   message?: string;
 }
+
+export interface ExchangeRate {
+  rate: number;
+  timestamp: string;
+}

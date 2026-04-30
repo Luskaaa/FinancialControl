@@ -1,12 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { message } from "antd";
 import ExpenseForm from "@/app/components/expense-form/ExpenseForm";
 import { ExpenseFormValues } from "@/types";
 
 export default function RegistarPage() {
   const [loading, setLoading] = useState(false);
+  const [descricoes, setDescricoes] = useState<string[]>([]);
+
+  const fetchDescricoes = useCallback(async () => {
+    try {
+      const response = await fetch("/api/expenses/descriptions");
+      if (!response.ok) return;
+      const data: string[] = await response.json();
+      setDescricoes(data);
+    } catch (error) {
+      console.error("Erro ao buscar descrições:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDescricoes();
+  }, [fetchDescricoes]);
 
   const handleSubmit = async (values: ExpenseFormValues) => {
     setLoading(true);
@@ -20,6 +36,7 @@ export default function RegistarPage() {
       if (!response.ok) throw new Error("Erro ao guardar");
 
       message.success("Gasto registado com sucesso!");
+      fetchDescricoes();
     } catch (error) {
       console.error(error);
       message.error("Erro ao registar gasto");
@@ -33,7 +50,11 @@ export default function RegistarPage() {
       <div className="flex justify-center">
         <h1 className="text-white text-xl md:text-2xl font-bold mb-3 md:mb-4">Registar Gasto</h1>
       </div>
-      <ExpenseForm onSubmit={handleSubmit} loading={loading} />
+      <ExpenseForm
+        onSubmit={handleSubmit}
+        loading={loading}
+        descricoesAnteriores={descricoes}
+      />
     </div>
   );
 }

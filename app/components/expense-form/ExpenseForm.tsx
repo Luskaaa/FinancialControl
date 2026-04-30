@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Form, Input, InputNumber, Button, DatePicker, Switch } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { ExpenseFormValues } from "@/types";
+import { ExpenseFormValues, ExchangeRate } from "@/types";
 import { normalizeNumber, normalizeText } from "@/utils";
 import {
   FORM_RULES,
@@ -14,15 +14,50 @@ import {
 } from "@/constants";
 import TextArea from "antd/es/input/TextArea";
 import Link from "next/link";
+import ExchangeRateBanner from "./ExchangeRateBanner";
 
 interface ExpenseFormProps {
   onSubmit: (values: ExpenseFormValues) => void;
   loading?: boolean;
+  descricoesAnteriores?: string[];
 }
 
-export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+export default function ExpenseForm({
+  onSubmit,
+  loading,
+  descricoesAnteriores = [],
+}: ExpenseFormProps) {
   const [form] = Form.useForm<ExpenseFormValues>();
   const [isParcelado, setIsParcelado] = useState(false);
+  const [exchangeRate, setExchangeRate] = useState<ExchangeRate | null>(null);
+  const [rateLoading, setRateLoading] = useState(true);
+  const [rateError, setRateError] = useState(false);
+  const submitModeRef = useRef<"reset" | "keep-date">("reset");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/exchange-rate")
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+      .then((data: ExchangeRate) => {
+        if (cancelled) return;
+        if (Number.isFinite(data.rate) && data.rate > 0) {
+          setExchangeRate(data);
+        } else {
+          setRateError(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setRateError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setRateLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleFinish = (values: ExpenseFormValues) => {
     onSubmit({
@@ -30,20 +65,45 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
       parcelado: isParcelado,
       numeroParcelas: isParcelado ? values.numeroParcelas : undefined,
     });
-    form.resetFields();
+    if (submitModeRef.current === "keep-date") {
+      const dataAtual = form.getFieldValue("data");
+      form.resetFields();
+      form.setFieldsValue({ data: dataAtual });
+    } else {
+      form.resetFields();
+    }
     setIsParcelado(false);
+    submitModeRef.current = "reset";
   };
 
   const setToday = () => {
     form.setFieldsValue({ data: dayjs() });
   };
 
+  const handleValuesChange = (changedValues: Partial<ExpenseFormValues>) => {
+    const rate = exchangeRate?.rate;
+    if (!rate) return;
+    if ("custoEUR" in changedValues && changedValues.custoEUR != null) {
+      form.setFieldsValue({ custoBRL: round2(changedValues.custoEUR * rate) });
+    } else if ("custoBRL" in changedValues && changedValues.custoBRL != null) {
+      form.setFieldsValue({ custoEUR: round2(changedValues.custoBRL / rate) });
+    }
+  };
+
   return (
     <Form
       form={form}
       onFinish={handleFinish}
+      onValuesChange={handleValuesChange}
       validateTrigger={["onBlur", "onChange"]}
+      initialValues={{ data: dayjs() }}
     >
+      <ExchangeRateBanner
+        rate={exchangeRate?.rate ?? null}
+        timestamp={exchangeRate?.timestamp ?? null}
+        error={rateError}
+        loading={rateLoading}
+      />
       <Form.Item
         name="custoEUR"
         rules={[
@@ -88,18 +148,44 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
           controls={false}
         />
       </Form.Item>
-      <Form.Item
-        name="data"
-        rules={[{ required: true, message: "Por favor, selecione a data" }]}
-      >
-        <DatePicker
-          showTime={false}
-          placeholder="Data"
-          className="w-full h-15"
+      <div className="flex gap-2 items-start">
+        <Form.Item
+          name="data"
+          rules={[{ required: true, message: "Por favor, selecione a data" }]}
+          className="flex-1 mb-6"
+        >
+          <DatePicker
+            showTime={false}
+            placeholder="Data"
+            className="w-full h-15"
+            size="large"
+            format={DATE_FORMAT}
+          />
+        </Form.Item>
+        <Button
           size="large"
-          format={DATE_FORMAT}
-        />
-      </Form.Item>
+          icon={<CalendarOutlined />}
+          onClick={setToday}
+          className="h-15"
+        >
+          Hoje
+        </Button>
+      </div>
+      {descricoesAnteriores.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {descricoesAnteriores.slice(0, 8).map((d) => (
+            <Button
+              key={d}
+              size="small"
+              type="default"
+              onClick={() => form.setFieldsValue({ descricao: d })}
+              className="max-w-full"
+            >
+              <span className="truncate">{d}</span>
+            </Button>
+          ))}
+        </div>
+      )}
       <Form.Item
         name="descricao"
         rules={[
@@ -167,21 +253,37 @@ export default function ExpenseForm({ onSubmit, loading }: ExpenseFormProps) {
         )}
       </div>
       <Form.Item>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-          <Link href="/consultar" className="order-2 sm:order-1">
-            <Button size="large" htmlType="button" className="w-full">
-              Consultar
-            </Button>
-          </Link>
+        <div className="flex flex-col gap-3 md:gap-4">
           <Button
             type="primary"
             size="large"
             htmlType="submit"
             loading={loading}
-            className="w-full order-1 sm:order-2"
+            onClick={() => {
+              submitModeRef.current = "reset";
+            }}
+            className="w-full"
           >
             Registar
           </Button>
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
+            <Link href="/consultar">
+              <Button size="large" htmlType="button" className="w-full">
+                Consultar
+              </Button>
+            </Link>
+            <Button
+              size="large"
+              htmlType="submit"
+              loading={loading}
+              onClick={() => {
+                submitModeRef.current = "keep-date";
+              }}
+              className="w-full"
+            >
+              Guardar e novo
+            </Button>
+          </div>
         </div>
       </Form.Item>
     </Form>
