@@ -1,0 +1,19 @@
+- generic [active] [ref=e1]:
+  - main [ref=e3]:
+    - generic [ref=e5]:
+      - heading "Controle de Gastos" [level=1] [ref=e6]
+      - generic [ref=e7]:
+        - link "Registar Gasto" [ref=e8] [cursor=pointer]:
+          - /url: /registar
+          - button "Registar Gasto" [ref=e9]
+        - link "Consultar Gastos" [ref=e10] [cursor=pointer]:
+          - /url: /consultar
+          - button "Consultar Gastos" [ref=e11]
+        - link "Dashboard" [ref=e12] [cursor=pointer]:
+          - /url: /dashboard
+          - button "Dashboard" [ref=e13]
+    - button "info-circle" [ref=e14]:
+      - img "info-circle" [ref=e16]:
+        - img [ref=e17]
+  - button "Open Next.js Dev Tools" [ref=e25] [cursor=pointer]:
+    - img [ref=e26]

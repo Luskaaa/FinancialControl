@@ -1,0 +1,63 @@
+- generic [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Registar Gasto" [level=1] [ref=e5]
+      - generic [ref=e6]:
+        - generic [ref=e7]: 💱 1 € = R$ 5,85 · 29/04 21:56
+        - generic [ref=e390]:
+          - generic: €
+          - spinbutton "Custo em EUR" [ref=e391]
+        - generic [ref=e397]:
+          - generic: R$
+          - spinbutton "Custo em R$" [ref=e398]
+        - generic [ref=e24]:
+          - generic [ref=e405]:
+            - textbox "Data" [ref=e406]: 25/04/2026
+            - generic:
+              - img "calendar":
+                - img
+            - button "close-circle" [ref=e407] [cursor=pointer]:
+              - img "close-circle" [ref=e408]:
+                - img [ref=e409]
+          - button "calendar Hoje" [ref=e75] [cursor=pointer]:
+            - img "calendar" [ref=e43]:
+              - img [ref=e44]
+            - generic [ref=e76]: Hoje
+        - generic [ref=e77]:
+          - button "Uber" [ref=e84] [cursor=pointer]:
+            - generic [ref=e85]: Uber
+          - button "Agatha" [ref=e80] [cursor=pointer]:
+            - generic [ref=e81]: Agatha
+          - button "Comida Aeroporto" [ref=e249] [cursor=pointer]:
+            - generic [ref=e250]: Comida Aeroporto
+          - button "Unhas" [ref=e78] [cursor=pointer]:
+            - generic [ref=e79]: Unhas
+          - button "Sache miley" [ref=e82] [cursor=pointer]:
+            - generic [ref=e83]: Sache miley
+          - button "Barbearia" [ref=e86] [cursor=pointer]:
+            - generic [ref=e87]: Barbearia
+          - button "Agatha" [ref=e88] [cursor=pointer]:
+            - generic [ref=e89]: Agatha
+          - button "Pipoca Balé" [ref=e90] [cursor=pointer]:
+            - generic [ref=e91]: Pipoca Balé
+        - textbox "Descrição" [ref=e416]
+        - generic [ref=e53]:
+          - generic [ref=e54]: Pagamento parcelado?
+          - switch [ref=e94] [cursor=pointer]
+        - generic [ref=e60]:
+          - button "Registar" [ref=e61] [cursor=pointer]:
+            - generic [ref=e97]: Registar
+          - generic [ref=e62]:
+            - link "Consultar" [ref=e63] [cursor=pointer]:
+              - /url: /consultar
+              - button "Consultar" [ref=e64]:
+                - generic [ref=e98]: Consultar
+            - button "Guardar e novo" [active] [ref=e65] [cursor=pointer]:
+              - generic [ref=e99]: Guardar e novo
+  - button "Open Next.js Dev Tools" [ref=e71] [cursor=pointer]:
+    - img [ref=e72]
+  - alert [ref=e100]
+  - generic [ref=e418]:
+    - img "check-circle" [ref=e419]:
+      - img [ref=e420]
+    - generic [ref=e422]: Gasto registado com sucesso!

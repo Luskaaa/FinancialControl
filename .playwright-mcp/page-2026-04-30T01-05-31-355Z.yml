@@ -1,0 +1,37 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Registar Gasto" [level=1] [ref=e5]
+      - generic [ref=e6]:
+        - generic [ref=e7]: 💱 A carregar cotação...
+        - generic [ref=e13]:
+          - generic [ref=e14]: €
+          - spinbutton "Custo em EUR" [ref=e15]
+        - generic [ref=e21]:
+          - generic [ref=e22]: R$
+          - spinbutton "Custo em R$" [ref=e23]
+        - generic [ref=e24]:
+          - generic [ref=e31]:
+            - textbox "Data" [ref=e32]: 30/04/2026
+            - img "calendar" [ref=e34]:
+              - img [ref=e35]
+            - button "close-circle" [ref=e37]:
+              - img "close-circle" [ref=e38]:
+                - img [ref=e39]
+          - button "calendarHoje" [ref=e41]:
+            - img "calendar" [ref=e43]:
+              - img [ref=e44]
+            - text: Hoje
+        - textbox "Descrição" [ref=e51]
+        - generic [ref=e53]:
+          - generic [ref=e54]: Pagamento parcelado?
+          - switch
+        - generic [ref=e60]:
+          - button "Registar" [ref=e61]
+          - generic [ref=e62]:
+            - link "Consultar" [ref=e63] [cursor=pointer]:
+              - /url: /consultar
+              - button "Consultar" [ref=e64]
+            - button "Guardar e novo" [ref=e65]
+  - button "Open Next.js Dev Tools" [ref=e71] [cursor=pointer]:
+    - img [ref=e72]

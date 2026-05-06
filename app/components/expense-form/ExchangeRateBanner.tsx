@@ -18,7 +18,7 @@ export default function ExchangeRateBanner({
 }: ExchangeRateBannerProps) {
   if (loading) {
     return (
-      <div className="text-gray-400 text-xs mb-3 text-center">
+      <div className="text-ink-soft text-xs mb-3 text-center">
         💱 A carregar cotação...
       </div>
     );
@@ -26,7 +26,7 @@ export default function ExchangeRateBanner({
 
   if (error || rate === null) {
     return (
-      <div className="text-amber-400 text-xs mb-3 text-center">
+      <div className="text-amber-600 text-xs mb-3 text-center">
         💱 Cotação indisponível — preencha manualmente
       </div>
     );
@@ -37,7 +37,7 @@ export default function ExchangeRateBanner({
     : "";
 
   return (
-    <div className="text-gray-400 text-xs mb-3 text-center">
+    <div className="text-ink-soft text-xs mb-3 text-center">
       💱 1 € = {formatCurrency(rate, "BRL")}
       {formattedTime && ` · ${formattedTime}`}
     </div>

@@ -44,7 +44,7 @@ export default function VersionButton() {
                 <div key={release.version}>
                   <div className="flex items-center gap-2 mb-2">
                     <Tag color="green">v{release.version}</Tag>
-                    <span className="text-gray-500 text-sm">
+                    <span className="text-ink-soft text-sm">
                       {release.date}
                     </span>
                   </div>

@@ -1,16 +1,17 @@
 @import "tailwindcss";
 
-.ant-menu {
-  background: transparent !important;
-}
-
-.ant-menu-item {
-  color: white !important;
-}
-
-.ant-menu-item-selected {
-  background-color: #1890ff !important;
-  color: white !important;
+@theme {
+  --color-warmblack: #0a0908;
+  --color-canvas: #f5f7fb;
+  --color-surface: #ffffff;
+  --color-ink: #0f172a;
+  --color-ink-soft: #475569;
+  --color-line: #e2e8f0;
+  --color-brand: #2563eb;
+  --color-brand-soft: #60a5fa;
+  --color-brand-tint: #dbeafe;
+  --font-display: var(--font-geist-sans);
+  --font-sans: var(--font-geist-sans);
 }
 
 .expense-table .ant-table {
@@ -21,20 +22,6 @@
   .expense-table .ant-table {
     font-size: 14px;
   }
-}
-
-.ant-select-selector {
-  background-color: #27272a !important;
-  border-color: #3f3f46 !important;
-}
-
-.ant-select-selection-item,
-.ant-select-selection-placeholder {
-  color: white !important;
-}
-
-.ant-select-arrow {
-  color: white !important;
 }
 
 @media (max-width: 640px) {
@@ -54,8 +41,21 @@
   }
 }
 
-.ant-pagination-item-link {
-  color: white !important;
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
 }
 
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 3px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}

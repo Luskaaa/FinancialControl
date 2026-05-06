@@ -208,11 +208,11 @@ export default function ConsultarPage() {
       key: "custoEUR",
       width: 90,
       align: "center" as const,
-      render: (value: number | null) => 
+      render: (value: number | null) =>
         value != null ? (
           <Tag color="blue">{formatCurrency(value, "EUR")}</Tag>
         ) : (
-          <span className="text-gray-500">-</span>
+          <span className="text-ink-soft">-</span>
         ),
     },
     {
@@ -221,11 +221,11 @@ export default function ConsultarPage() {
       key: "custoBRL",
       width: 95,
       align: "center" as const,
-      render: (value: number | null) => 
+      render: (value: number | null) =>
         value != null ? (
           <Tag color="green">{formatCurrency(value, "BRL")}</Tag>
         ) : (
-          <span className="text-gray-500">-</span>
+          <span className="text-ink-soft">-</span>
         ),
     },
     {
@@ -284,7 +284,7 @@ export default function ConsultarPage() {
   return (
     <div className="col-span-4 md:col-span-8 xl:col-span-12 flex flex-col lg:flex-row gap-3 md:gap-4 h-full max-h-full overflow-hidden">
       {/* Mobile/Tablet: Dropdown selector */}
-      <div className="lg:hidden bg-zinc-900 text-white shadow-lg p-3 rounded-xl">
+      <div className="lg:hidden bg-surface border border-line text-ink shadow-sm p-3 rounded-xl">
         <div className="flex items-center gap-2 mb-2">
           <CalendarOutlined />
           <span className="font-semibold">Selecionar Mês</span>
@@ -302,19 +302,19 @@ export default function ConsultarPage() {
         />
       </div>
 
-      <div className="hidden lg:flex w-48 bg-zinc-900 text-white shadow-lg p-4 rounded-2xl shrink-0 flex-col max-h-full">
-        <h2 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
+      <div className="hidden lg:flex w-48 bg-surface border border-line text-ink shadow-sm p-4 rounded-2xl shrink-0 flex-col max-h-full">
+        <h2 className="text-ink text-lg font-semibold mb-4 flex items-center gap-2">
           <CalendarOutlined /> Meses
         </h2>
-        <div className="flex flex-col gap-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-800">
+        <div className="flex flex-col gap-1 overflow-y-auto pr-1 thin-scrollbar">
           {availableMonths.map(([key, { label }]) => (
             <button
               key={key}
               onClick={() => setSelectedMonth(key)}
               className={`text-left px-3 py-2 rounded-lg capitalize transition-colors ${
                 selectedMonth === key
-                  ? "bg-blue-500 text-white"
-                  : "text-gray-300 hover:bg-zinc-800"
+                  ? "bg-brand text-white shadow-sm"
+                  : "text-ink-soft hover:bg-canvas hover:text-ink"
               }`}
             >
               {label}
@@ -322,25 +322,24 @@ export default function ConsultarPage() {
           ))}
         </div>
         {availableMonths.length === 0 && (
-          <p className="text-gray-400 text-sm">Nenhum gasto registado</p>
+          <p className="text-ink-soft text-sm">Nenhum gasto registado</p>
         )}
       </div>
 
-      <div className="flex-1 bg-zinc-900 shadow-lg p-3 md:p-4 rounded-xl md:rounded-2xl min-w-0 overflow-hidden flex flex-col">
+      <div className="flex-1 bg-surface border border-line shadow-sm p-3 md:p-4 rounded-xl md:rounded-2xl min-w-0 overflow-hidden flex flex-col">
         <div className="flex justify-center mb-3 md:mb-4">
-          <h1 className="text-white text-lg md:text-2xl font-bold capitalize text-center truncate">
+          <h1 className="text-ink text-lg md:text-2xl font-bold capitalize text-center truncate tracking-tight">
             Gastos de {monthlyTotals.monthName}
           </h1>
         </div>
         <div className="mb-3 md:mb-4">
           <Input
             placeholder="Pesquisar por descrição..."
-            prefix={<SearchOutlined className="text-gray-400" />}
+            prefix={<SearchOutlined className="text-ink-soft" />}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             allowClear
             size="large"
-            className="search-input"
           />
         </div>
         <div className="overflow-auto flex-1 min-h-0">
@@ -355,26 +354,27 @@ export default function ConsultarPage() {
           />
         </div>
 
-        <div className="mt-auto pt-3 md:pt-4 bg-zinc-800 border-zinc-700 flex flex-col p-3 md:p-4 rounded-lg shrink-0">
-          <h2 className="text-white text-sm md:text-lg font-semibold mb-3 md:mb-4 capitalize text-center">
+        <div className="mt-auto pt-3 md:pt-4 bg-canvas border border-line flex flex-col p-3 md:p-4 rounded-lg shrink-0">
+          <h2 className="text-ink text-sm md:text-lg font-semibold mb-3 md:mb-4 capitalize text-center">
             Total de {monthlyTotals.monthName}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
             <Statistic
               title={
-                <span className="text-gray-400 text-xs md:text-sm">Gastos</span>
+                <span className="text-ink-soft text-xs md:text-sm">Gastos</span>
               }
               value={monthlyTotals.count}
               styles={{
                 content: {
-                  color: "#fff",
+                  color: "#0f172a",
                   fontSize: "1.25rem",
+                  fontWeight: 600,
                 },
               }}
             />
             <Statistic
               title={
-                <span className="text-gray-400 text-xs md:text-sm">
+                <span className="text-ink-soft text-xs md:text-sm">
                   Total EUR
                 </span>
               }
@@ -383,14 +383,15 @@ export default function ConsultarPage() {
               prefix="€"
               styles={{
                 content: {
-                  color: "#1890ff",
+                  color: "#2563eb",
                   fontSize: "1.25rem",
+                  fontWeight: 600,
                 },
               }}
             />
             <Statistic
               title={
-                <span className="text-gray-400 text-xs md:text-sm">
+                <span className="text-ink-soft text-xs md:text-sm">
                   Total BRL
                 </span>
               }
@@ -399,8 +400,9 @@ export default function ConsultarPage() {
               prefix="R$"
               styles={{
                 content: {
-                  color: "#1890ff",
+                  color: "#60a5fa",
                   fontSize: "1.25rem",
+                  fontWeight: 600,
                 },
               }}
             />

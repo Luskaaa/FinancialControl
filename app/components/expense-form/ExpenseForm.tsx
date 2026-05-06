@@ -217,9 +217,9 @@ export default function ExpenseForm({
           autoSize={{ minRows: 3, maxRows: 6 }}
         />
       </Form.Item>
-      <div className="bg-zinc-800 p-4 rounded-lg mb-6 flex flex-col gap-5">
+      <div className="bg-canvas border border-line p-4 rounded-lg mb-6 flex flex-col gap-5">
         <div className="flex items-center justify-between ">
-          <span className="text-white">Pagamento parcelado?</span>
+          <span className="text-ink font-medium">Pagamento parcelado?</span>
           <Switch
             checked={isParcelado}
             onChange={(checked) => {
